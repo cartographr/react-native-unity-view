@@ -15,7 +15,9 @@ char** g_argv;
 
 void UnityInitTrampoline();
 
+#if !TARGET_OS_SIMULATOR
 UnityFramework* ufw;
+#endif // !TARGET_OS_SIMULATOR
 
 extern "C" void InitArgs(int argc, char* argv[])
 {
@@ -28,6 +30,7 @@ extern "C" bool UnityIsInited()
     return unity_inited;
 }
 
+#if !TARGET_OS_SIMULATOR
 UnityFramework* UnityFrameworkLoad() {
     NSString* bundlePath = nil;
     bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -39,6 +42,7 @@ UnityFramework* UnityFrameworkLoad() {
     UnityFramework* ufw = [bundle.principalClass getInstance];
     return ufw;
 }
+#endif // !TARGET_OS_SIMULATOR
 
 extern "C" void InitUnity()
 {
@@ -47,31 +51,39 @@ extern "C" void InitUnity()
     }
     unity_inited = true;
 
+#if !TARGET_OS_SIMULATOR
     ufw = UnityFrameworkLoad();
 
     [ufw setDataBundleId: "com.unity3d.framework"];
     [ufw frameworkWarmup: g_argc argv: g_argv];
+#endif // !TARGET_OS_SIMULATOR
 }
 
 extern "C" void UnityPostMessage(NSString* gameObject, NSString* methodName, NSString* message)
 {
+#if !TARGET_OS_SIMULATOR
     dispatch_async(dispatch_get_main_queue(), ^{
         [ufw sendMessageToGOWithName:[gameObject UTF8String] functionName:[methodName UTF8String] message:[message UTF8String]];
     });
+#endif // !TARGET_OS_SIMULATOR
 }
 
 extern "C" void UnityPauseCommand()
 {
+#if !TARGET_OS_SIMULATOR
     dispatch_async(dispatch_get_main_queue(), ^{
         [ufw pause:true];
     });
+#endif // !TARGET_OS_SIMULATOR
 }
 
 extern "C" void UnityResumeCommand()
 {
+#if !TARGET_OS_SIMULATOR
     dispatch_async(dispatch_get_main_queue(), ^{
         [ufw pause:false];
     });
+#endif // !TARGET_OS_SIMULATOR
 }
 
 @implementation UnityUtils
@@ -89,6 +101,7 @@ static BOOL _isUnityReady = NO;
     if (!_isUnityReady) {
         return;
     }
+#if !TARGET_OS_SIMULATOR
     UnityAppController* unityAppController = GetAppController();
 
     UIApplication* application = [UIApplication sharedApplication];
@@ -106,6 +119,7 @@ static BOOL _isUnityReady = NO;
     } else if ([notification.name isEqualToString:UIApplicationDidReceiveMemoryWarningNotification]) {
         [unityAppController applicationDidReceiveMemoryWarning:application];
     }
+#endif // !TARGET_OS_SIMULATOR
 }
 
 + (void)listenAppState
@@ -146,6 +160,7 @@ static BOOL _isUnityReady = NO;
         // Always keep RN window in top
         application.keyWindow.windowLevel = UIWindowLevelNormal + 1;
 
+#if !TARGET_OS_SIMULATOR
         InitUnity();
         
         UnityAppController *controller = GetAppController();
@@ -156,6 +171,7 @@ static BOOL _isUnityReady = NO;
         [application.windows[1] makeKeyWindow];
         
         [UnityUtils listenAppState];
+#endif // !TARGET_OS_SIMULATOR
     });
 }
 

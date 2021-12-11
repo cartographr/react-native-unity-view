@@ -10,17 +10,21 @@ RCT_EXPORT_MODULE(RNUnityView)
 - (UIView *)view
 {
     self.currentView = [[RNUnityView alloc] init];
+#if !TARGET_OS_SIMULATOR
     if ([UnityUtils isUnityReady]) {
         [self.currentView setUnityView: [GetAppController() unityView]];
     } else {
         [UnityUtils createPlayer:^{
             [self.currentView setUnityView: [GetAppController() unityView]];
         }];
-        [GetAppController() setUnityMessageHandler: ^(const char* message) {
-            [_bridge.eventDispatcher sendDeviceEventWithName:@"onUnityMessage"
-                                                            body:[NSString stringWithUTF8String:message]];
-        }];
     }
+
+    [GetAppController() setUnityMessageHandler: ^(const char* message) {
+        [_bridge.eventDispatcher sendDeviceEventWithName:@"onUnityMessage"
+                                                    body:[NSString stringWithUTF8String:message]];
+    }];
+#endif // !TARGET_OS_SIMULATOR
+    
     return self.currentView;
 }
 
