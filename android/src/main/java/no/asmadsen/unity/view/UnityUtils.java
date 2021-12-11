@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import com.unity3d.player.UnityPlayer;
@@ -95,13 +96,14 @@ public class UnityUtils {
     }
 
     /**
-     * Invoke by unity C#
+     * Invoked by unity C#
      */
     public static void onUnityMessage(String message) {
         for (UnityEventListener listener : mUnityEventListeners) {
             try {
                 listener.onMessage(message);
             } catch (Exception e) {
+                Log.v("RNUnityView", "Error dispatching message to listener", e);
             }
         }
     }

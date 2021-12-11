@@ -7,6 +7,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import androidx.annotation.NonNull;
+
 public class UnityNativeModule extends ReactContextBaseJavaModule implements UnityEventListener {
 
     public UnityNativeModule(ReactApplicationContext reactContext) {
@@ -14,11 +16,11 @@ public class UnityNativeModule extends ReactContextBaseJavaModule implements Uni
         UnityUtils.addUnityEventListener(this);
     }
 
+    @NonNull
     @Override
     public String getName() {
         return "UnityNativeModule";
     }
-
 
     @ReactMethod
     public void isReady(Promise promise) {

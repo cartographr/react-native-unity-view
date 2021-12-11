@@ -9,11 +9,13 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+import androidx.annotation.NonNull;
+
 public class UnityViewManager extends SimpleViewManager<UnityView>
         implements LifecycleEventListener, View.OnAttachStateChangeListener {
     private static final String REACT_CLASS = "RNUnityView";
 
-    private ReactApplicationContext context;
+    private final ReactApplicationContext context;
 
     UnityViewManager(ReactApplicationContext context) {
         super();
@@ -21,13 +23,15 @@ public class UnityViewManager extends SimpleViewManager<UnityView>
         context.addLifecycleEventListener(this);
     }
 
+    @NonNull
     @Override
     public String getName() {
         return REACT_CLASS;
     }
 
+    @NonNull
     @Override
-    protected UnityView createViewInstance(ThemedReactContext reactContext) {
+    protected UnityView createViewInstance(@NonNull ThemedReactContext reactContext) {
         final UnityView view = new UnityView(reactContext);
         view.addOnAttachStateChangeListener(this);
 
