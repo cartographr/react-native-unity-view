@@ -16,6 +16,8 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
     fun resume() {
         if (!valid) return
         if (!isResumed.getAndSet(true)) {
+            player.onWindowFocusChanged(true)
+            player.requestFocus()
             player.resume()
         }
     }

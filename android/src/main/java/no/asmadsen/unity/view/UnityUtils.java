@@ -96,6 +96,7 @@ public class UnityUtils {
         final Activity activity = ((Activity) unity.getPlayer().getContext());
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
         activity.addContentView(unity.getPlayer(), layoutParams);
+        unity.pause();
     }
 
     public static void addUnityViewToGroup(ViewGroup group, ManagedUnityPlayer unity) {
@@ -107,8 +108,6 @@ public class UnityUtils {
         }
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         group.addView(unity.getPlayer(), 0, layoutParams);
-        unity.getPlayer().windowFocusChanged(true);
-        unity.getPlayer().requestFocus();
         unity.resume();
     }
 
