@@ -19,8 +19,11 @@ class UnityViewManager internal constructor(
         val view = UnityView(reactContext)
 
         val activity = reactContext.currentActivity ?: return view
+        UnityPlayerManager.activeRequests.incrementAndGet()
         UnityPlayerManager.acquire(activity) { player ->
-            view.setUnityPlayer(player)
+            if (UnityPlayerManager.activeRequests.get() > 0) {
+                view.setUnityPlayer(player)
+            }
         }
 
         return view
@@ -28,6 +31,7 @@ class UnityViewManager internal constructor(
 
     override fun onDropViewInstance(view: UnityView) {
         super.onDropViewInstance(view)
+        UnityPlayerManager.activeRequests.decrementAndGet()
         UnityPlayerManager.get(context.currentActivity)?.pause()
     }
 
@@ -40,6 +44,6 @@ class UnityViewManager internal constructor(
     }
 
     override fun onHostDestroy() {
-        UnityPlayerManager.get(context.currentActivity)?.destroy()
+        UnityPlayerManager.destroy()
     }
 }

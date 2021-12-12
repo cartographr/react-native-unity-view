@@ -7,9 +7,10 @@ import android.widget.FrameLayout
 class UnityView(context: Context) : FrameLayout(context) {
     private var unity: ManagedUnityPlayer? = null
 
-    fun setUnityPlayer(player: ManagedUnityPlayer?) {
+    fun setUnityPlayer(player: ManagedUnityPlayer) {
         unity = player
         UnityUtils.addUnityViewToGroup(this, player)
+        player.resume()
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
@@ -28,6 +29,7 @@ class UnityView(context: Context) : FrameLayout(context) {
             if (unity.player.parent !== this) {
                 UnityUtils.addUnityViewToGroup(this, unity)
             }
+            unity.resume()
         }
     }
 

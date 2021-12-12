@@ -27,20 +27,23 @@ public class UnityUtils {
 //                    fullScreen = true;
 //                }
 
-                final UnityPlayer unityPlayer = new UnityPlayer(activity);
+                final ManagedUnityPlayer unity =
+                    new ManagedUnityPlayer(new UnityPlayer(activity));
 
 //                try {
-//                    // wait a moument. fix unity cannot start when startup.
+//                    // wait a moment. fix unity cannot start when startup.
 //                    Thread.sleep(1000);
 //                } catch (Exception e) {
 //                }
 
-//                // start unity
-//                addUnityViewToBackground();
-//                unityPlayer.windowFocusChanged(true);
-//                unityPlayer.requestFocus();
-//                unityPlayer.resume();
-//
+                // start unity
+                addUnityViewToBackground(unity);
+                unity.resume();
+
+                if (UnityPlayerManager.INSTANCE.getActiveRequests().get() == 0) {
+                    unity.pause();
+                }
+
 //                // restore window layout
 //                if (!fullScreen) {
 //                    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
@@ -49,7 +52,7 @@ public class UnityUtils {
 //                _isUnityReady = true;
 //                callback.onReady();
 
-                callback.onReady(new ManagedUnityPlayer(unityPlayer));
+                callback.onReady(unity);
             }
         });
     }
