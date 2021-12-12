@@ -2,3 +2,5 @@ example
 scripts
 docs
 template
+/android/UnityExport
+/android/settings.gradle
