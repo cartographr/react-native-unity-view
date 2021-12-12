@@ -2,6 +2,7 @@ package no.asmadsen.unity.view
 
 import android.os.Looper
 import android.util.Log
+import android.view.ViewGroup
 import com.unity3d.player.UnityPlayer
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -19,6 +20,10 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
 
     val valid: Boolean
         get() = isValid.get()
+
+    fun removeFromParent() {
+        (player.parent as? ViewGroup)?.removeView(player)
+    }
 
     fun resume() {
         if (!valid) return log("resume: not valid")

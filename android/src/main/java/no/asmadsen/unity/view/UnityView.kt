@@ -2,6 +2,7 @@ package no.asmadsen.unity.view
 
 import android.content.Context
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.FrameLayout
 
 class UnityView(context: Context) : FrameLayout(context) {
@@ -9,6 +10,7 @@ class UnityView(context: Context) : FrameLayout(context) {
 
     fun setUnityPlayer(player: ManagedUnityPlayer) {
         unity = player
+        Log.v("UnityView", "setUnityPlayer")
         UnityUtils.addUnityViewToGroup(this, player)
         player.resume()
     }
@@ -36,6 +38,7 @@ class UnityView(context: Context) : FrameLayout(context) {
     override fun onDetachedFromWindow() {
         unity?.let { unity ->
             UnityUtils.addUnityViewToBackground(unity)
+            unity.pause()
         }
         super.onDetachedFromWindow()
     }

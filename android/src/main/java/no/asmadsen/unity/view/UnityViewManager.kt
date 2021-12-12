@@ -1,5 +1,6 @@
 package no.asmadsen.unity.view
 
+import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.bridge.LifecycleEventListener
@@ -21,7 +22,9 @@ class UnityViewManager internal constructor(
         val activity = reactContext.currentActivity ?: return view
         UnityPlayerManager.activeRequests.incrementAndGet()
         UnityPlayerManager.acquire(activity) { player ->
-            if (UnityPlayerManager.activeRequests.get() > 0) {
+            val activeRequests = UnityPlayerManager.activeRequests.get()
+            Log.v("UnityView", "Acquired player; activeRequests=$activeRequests")
+            if (activeRequests > 0) {
                 view.setUnityPlayer(player)
             }
         }

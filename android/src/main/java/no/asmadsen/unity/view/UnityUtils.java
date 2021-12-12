@@ -41,6 +41,7 @@ public class UnityUtils {
                 unity.resume();
 
                 if (UnityPlayerManager.INSTANCE.getActiveRequests().get() == 0) {
+                    Log.v("UnityView", "no active requests");
                     unity.pause();
                 }
 
@@ -90,28 +91,22 @@ public class UnityUtils {
         if (unity == null) {
             return;
         }
-        if (unity.getPlayer().getParent() != null) {
-            ((ViewGroup) unity.getPlayer().getParent()).removeView(unity.getPlayer());
-        }
+        unity.removeFromParent();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             unity.getPlayer().setZ(-1f);
         }
         final Activity activity = ((Activity) unity.getPlayer().getContext());
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
         activity.addContentView(unity.getPlayer(), layoutParams);
-        unity.pause();
     }
 
     public static void addUnityViewToGroup(ViewGroup group, ManagedUnityPlayer unity) {
         if (unity == null) {
             return;
         }
-        if (unity.getPlayer().getParent() != null) {
-            ((ViewGroup) unity.getPlayer().getParent()).removeView(unity.getPlayer());
-        }
+        unity.removeFromParent();
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         group.addView(unity.getPlayer(), 0, layoutParams);
-        unity.resume();
     }
 
     public interface CreateCallback {
