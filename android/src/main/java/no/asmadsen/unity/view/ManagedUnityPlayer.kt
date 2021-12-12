@@ -1,5 +1,6 @@
 package no.asmadsen.unity.view
 
+import android.os.Looper
 import android.util.Log
 import com.unity3d.player.UnityPlayer
 import java.util.concurrent.atomic.AtomicBoolean
@@ -27,8 +28,10 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
         }
         if (!isResumed.getAndSet(true)) {
             log("resume")
-            player.onWindowFocusChanged(true)
-            player.requestFocus()
+            if (Looper.myLooper() === Looper.getMainLooper()) {
+                player.onWindowFocusChanged(true)
+                player.requestFocus()
+            }
             player.resume()
         } else {
             log("resume: already resumed")
