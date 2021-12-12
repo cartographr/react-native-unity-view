@@ -5,21 +5,28 @@ def safeExtGet(prop, fallback) {
 }
 
 buildscript {
+    ext.kotlin_version = '1.6.10-RC'
     // The Android Gradle plugin is only required when opening the android folder stand-alone.
     // This avoids unnecessary downloads and potential conflicts when the library is included as a
     // module dependency in an application project.
     if (project == rootProject) {
         repositories {
             google()
-            jcenter()
         }
         dependencies {
-            classpath 'com.android.tools.build:gradle:3.4.1'
+            classpath 'com.android.tools.build:gradle:3.4.3'
         }
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'maven'
 
 // Matches values in recent template from React Native 0.59 / 0.60
@@ -69,6 +76,7 @@ dependencies {
     }
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 def configureReactNativePom(def pom) {

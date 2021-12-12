@@ -21,6 +21,7 @@ public class UnityViewPackage implements ReactPackage {
 
     @NonNull
     @Override
+    @SuppressWarnings("rawtypes")
     public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
         List<ViewManager> viewManagers = new ArrayList<>();
         viewManagers.add(new UnityViewManager(reactContext));
