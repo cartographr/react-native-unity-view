@@ -12,7 +12,7 @@ class UnityViewManager internal constructor(
 
     override fun getName(): String = "RNUnityView"
 
-    override fun initialize() {
+    init {
         context.addLifecycleEventListener(this)
     }
 
@@ -39,14 +39,17 @@ class UnityViewManager internal constructor(
     }
 
     override fun onHostResume() {
+        Log.v("UnityView", "onHostResume")
         UnityPlayerManager.get(context.currentActivity)?.resume()
     }
 
     override fun onHostPause() {
-        UnityPlayerManager.get(context.currentActivity)?.pause()
+        Log.v("UnityView", "onHostPause")
+        UnityPlayerManager.pause()
     }
 
     override fun onHostDestroy() {
+        Log.v("UnityView", "onHostDestroy")
         UnityPlayerManager.destroy()
     }
 }

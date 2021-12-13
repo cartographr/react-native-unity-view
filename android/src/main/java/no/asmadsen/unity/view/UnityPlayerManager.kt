@@ -55,6 +55,10 @@ object UnityPlayerManager {
         }
     }
 
+    fun pause() {
+        lastPlayer?.pause()
+    }
+
     fun destroy() {
         lastPlayer?.destroy()
         lastPlayer = null
