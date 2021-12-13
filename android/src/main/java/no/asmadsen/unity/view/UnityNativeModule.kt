@@ -54,12 +54,16 @@ class UnityNativeModule(
 
     @ReactMethod
     fun pause() {
-//        UnityPlayerManager.get(currentActivity)?.pause()
+        // NOTE: This is a no-op; there should be no need to manually pause or resume
+        // It *could* be implemented using:
+        //   UnityPlayerManager.get(currentActivity)?.pause()
     }
 
     @ReactMethod
     fun resume() {
-//        UnityPlayerManager.get(currentActivity)?.resume()
+        // NOTE: This is a no-op; there should be no need to manually pause or resume
+        // It *could* be implemented using:
+        //   UnityPlayerManager.get(currentActivity)?.resume()
     }
 
     override fun onMessage(message: String) {
