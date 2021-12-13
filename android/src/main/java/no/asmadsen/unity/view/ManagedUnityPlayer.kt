@@ -25,7 +25,6 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
     }
 
     private val isValid = AtomicBoolean(true)
-    private val isResumed = AtomicBoolean(false)
     private val currentState = AtomicReference(State.PAUSED)
 
     val valid: Boolean
@@ -40,11 +39,6 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
         if (player.parent == null) {
             log("resume: not attached")
             return
-        }
-        if (!isResumed.getAndSet(true)) {
-            log("resume")
-        } else {
-            log("resume: already resumed")
         }
 
         val state = currentState.get()
@@ -76,12 +70,6 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
 
     fun pause() {
         if (!valid) return log("pause: not valid")
-        if (isResumed.getAndSet(false)) {
-            log("pause")
-        } else {
-            log("pause: already paused")
-        }
-
         val state = currentState.get()
         if (state == State.PAUSED) {
             log("pause: already PAUSED")
