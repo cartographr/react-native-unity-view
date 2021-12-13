@@ -5,10 +5,10 @@ import android.app.Activity
 import android.graphics.PixelFormat
 import android.util.Log
 import com.unity3d.player.UnityPlayer
-import no.asmadsen.unity.view.UnityPlayerManager.activeRequests
-import no.asmadsen.unity.view.UnityUtils.CreateCallback
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
+
+const val DEFAULT_WARMUP_DURATION_MS = 1000L
 
 /**
  * @author dhleong
@@ -35,7 +35,11 @@ object UnityPlayerManager {
         return null
     }
 
-    fun acquire(activity: Activity, onReady: (ManagedUnityPlayer) -> Unit) {
+    fun acquire(
+        activity: Activity,
+        warmupDurationMs: Long = DEFAULT_WARMUP_DURATION_MS,
+        onReady: (ManagedUnityPlayer) -> Unit,
+    ) {
         val existing = get(activity)
         if (existing != null) {
             return onReady(existing)
@@ -47,7 +51,7 @@ object UnityPlayerManager {
 
         if (!hasRequests) {
             Log.v("UnityView", "createPlayer")
-            createPlayer(activity) { player ->
+            createPlayer(activity, warmupDurationMs) { player ->
                 lastPlayer = player
                 for (request in requests) {
                     request(player)
@@ -70,7 +74,11 @@ object UnityPlayerManager {
 
     fun hasPlayer(): Boolean = lastPlayer?.valid == true
 
-    private fun createPlayer(activity: Activity, callback: (ManagedUnityPlayer) -> Unit) {
+    private fun createPlayer(
+        activity: Activity,
+        warmupDurationMs: Long,
+        callback: (ManagedUnityPlayer) -> Unit,
+    ) {
         activity.runOnUiThread {
             activity.window.setFormat(PixelFormat.RGBA_8888)
             val unity = ManagedUnityPlayer(UnityPlayer(activity))
@@ -80,12 +88,20 @@ object UnityPlayerManager {
             unity.resume()
 
             if (activeRequests.get() == 0) {
-                // TODO Delay pausing to continue warming up
                 Log.v("UnityView", "no active requests")
-                unity.pause()
+                unity.pauseAfterWarmup(warmupDurationMs)
             }
 
             callback(unity)
         }
+    }
+
+    private fun ManagedUnityPlayer.pauseAfterWarmup(warmupDurationMs: Long) {
+        // NOTE: We delay the pause to give Unity a chance to "warm up"
+        player.view.postDelayed({
+            if (activeRequests.get() == 0) {
+                pause()
+            }
+        }, warmupDurationMs)
     }
 }

@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import kotlin.math.roundToLong
 
 class UnityNativeModule(
     reactContext: ReactApplicationContext
@@ -23,12 +24,13 @@ class UnityNativeModule(
     }
 
     @ReactMethod
-    fun createUnity(promise: Promise) {
+    fun createUnity(warmupDurationMs: Double?, promise: Promise) {
         val activity = currentActivity
         if (activity == null) {
             promise.resolve(false)
         } else {
-            UnityPlayerManager.acquire(activity) {
+            val warmup = warmupDurationMs?.roundToLong() ?: DEFAULT_WARMUP_DURATION_MS
+            UnityPlayerManager.acquire(activity, warmupDurationMs = warmup) {
                 promise.resolve(true)
             }
         }
