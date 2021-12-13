@@ -24,13 +24,24 @@ class UnityNativeModule(
     }
 
     @ReactMethod
-    fun createUnity(warmupDurationMs: Double?, promise: Promise) {
+    fun createUnity(promise: Promise) {
+        createUnityWithWarmupDurationMs(DEFAULT_WARMUP_DURATION_MS, promise)
+    }
+
+    @ReactMethod
+    fun createUnityWithWarmupSeconds(warmupDurationMs: Double, promise: Promise) {
+        createUnityWithWarmupDurationMs((warmupDurationMs * 1000).roundToLong(), promise)
+    }
+
+    private fun createUnityWithWarmupDurationMs(
+        warmupDurationMs: Long,
+        promise: Promise,
+    ) {
         val activity = currentActivity
         if (activity == null) {
             promise.resolve(false)
         } else {
-            val warmup = warmupDurationMs?.roundToLong() ?: DEFAULT_WARMUP_DURATION_MS
-            UnityPlayerManager.acquire(activity, warmupDurationMs = warmup) {
+            UnityPlayerManager.acquire(activity, warmupDurationMs = warmupDurationMs) {
                 promise.resolve(true)
             }
         }
