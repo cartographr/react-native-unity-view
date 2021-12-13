@@ -40,7 +40,9 @@ class UnityViewManager internal constructor(
 
     override fun onHostResume() {
         Log.v("UnityView", "onHostResume")
-        UnityPlayerManager.get(context.currentActivity)?.resume()
+        if (UnityPlayerManager.activeRequests.get() > 0) {
+            UnityPlayerManager.get(context.currentActivity)?.resume()
+        }
     }
 
     override fun onHostPause() {
