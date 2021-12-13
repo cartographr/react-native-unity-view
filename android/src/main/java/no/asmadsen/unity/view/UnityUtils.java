@@ -21,20 +21,9 @@ public class UnityUtils {
             @Override
             public void run() {
                 activity.getWindow().setFormat(PixelFormat.RGBA_8888);
-//                int flag = activity.getWindow().getAttributes().flags;
-//                boolean fullScreen = false;
-//                if ((flag & WindowManager.LayoutParams.FLAG_FULLSCREEN) == WindowManager.LayoutParams.FLAG_FULLSCREEN) {
-//                    fullScreen = true;
-//                }
 
                 final ManagedUnityPlayer unity =
                     new ManagedUnityPlayer(new UnityPlayer(activity));
-
-//                try {
-//                    // wait a moment. fix unity cannot start when startup.
-//                    Thread.sleep(1000);
-//                } catch (Exception e) {
-//                }
 
                 // start unity
                 addUnityViewToBackground(unity);
@@ -44,14 +33,6 @@ public class UnityUtils {
                     Log.v("UnityView", "no active requests");
                     unity.pause();
                 }
-
-//                // restore window layout
-//                if (!fullScreen) {
-//                    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-//                    activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                }
-//                _isUnityReady = true;
-//                callback.onReady();
 
                 callback.onReady(unity);
             }

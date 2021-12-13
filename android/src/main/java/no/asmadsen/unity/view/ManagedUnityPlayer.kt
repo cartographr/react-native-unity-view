@@ -24,28 +24,6 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
         log("create unity")
     }
 
-    private val queueGLThreadEventMethod by lazy {
-        try {
-            UnityPlayer::class.java.getDeclaredMethod(
-                "queueGLThreadEvent",
-                Runnable::class.java
-            ).apply {
-                isAccessible = true
-            }
-        } catch (e: Throwable) {
-            Log.w("UnityView", "ERROR resolving queueGLThreadEvent", e)
-            requireNotNull(
-                UnityPlayer::class.java.declaredMethods.find {
-                    log("examine: ${it.name} / ${it.parameterTypes.toList()}")
-                    it.parameterTypes.size == 1 && Runnable::class.java == it.parameterTypes[0]
-                }?.apply {
-                    log("found: $name")
-                    isAccessible = true
-                }
-            ) { "Couldn't find queueGLThreadEvent" }
-        }
-    }
-
     private val isValid = AtomicBoolean(true)
     private val isResumed = AtomicBoolean(false)
     private val currentState = AtomicReference(State.PAUSED)
@@ -141,7 +119,31 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
         queueGLThreadEventMethod.invoke(player, Runnable(callback))
     }
 
-    private fun log(message: String) {
-        if (BuildConfig.DEBUG) Log.v("UnityView", message)
+    companion object {
+        private fun log(message: String) {
+            if (BuildConfig.DEBUG) Log.v("UnityView", message)
+        }
+
+        private val queueGLThreadEventMethod by lazy {
+            try {
+                UnityPlayer::class.java.getDeclaredMethod(
+                    "queueGLThreadEvent",
+                    Runnable::class.java
+                ).apply {
+                    isAccessible = true
+                }
+            } catch (e: Throwable) {
+                Log.w("UnityView", "ERROR resolving queueGLThreadEvent", e)
+                requireNotNull(
+                    UnityPlayer::class.java.declaredMethods.find {
+                        log("examine: ${it.name} / ${it.parameterTypes.toList()}")
+                        it.parameterTypes.size == 1 && Runnable::class.java == it.parameterTypes[0]
+                    }?.apply {
+                        log("found: $name")
+                        isAccessible = true
+                    }
+                ) { "Couldn't find queueGLThreadEvent" }
+            }
+        }
     }
 }
