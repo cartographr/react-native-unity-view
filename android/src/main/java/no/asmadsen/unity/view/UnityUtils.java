@@ -1,7 +1,6 @@
 package no.asmadsen.unity.view;
 
 import android.app.Activity;
-import android.graphics.PixelFormat;
 import android.os.Build;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -15,29 +14,6 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 public class UnityUtils {
     private static final CopyOnWriteArraySet<UnityEventListener> mUnityEventListeners =
             new CopyOnWriteArraySet<>();
-
-    public static void createPlayer(final Activity activity, final CreateCallback callback) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                activity.getWindow().setFormat(PixelFormat.RGBA_8888);
-
-                final ManagedUnityPlayer unity =
-                    new ManagedUnityPlayer(new UnityPlayer(activity));
-
-                // start unity
-                addUnityViewToBackground(unity);
-                unity.resume();
-
-                if (UnityPlayerManager.INSTANCE.getActiveRequests().get() == 0) {
-                    Log.v("UnityView", "no active requests");
-                    unity.pause();
-                }
-
-                callback.onReady(unity);
-            }
-        });
-    }
 
     public static void postMessage(String gameObject, String methodName, String message) {
         if (!UnityPlayerManager.INSTANCE.hasPlayer()) {
@@ -88,9 +64,5 @@ public class UnityUtils {
         unity.removeFromParent();
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         group.addView(unity.getPlayer(), 0, layoutParams);
-    }
-
-    public interface CreateCallback {
-        void onReady(ManagedUnityPlayer unityPlayer);
     }
 }
