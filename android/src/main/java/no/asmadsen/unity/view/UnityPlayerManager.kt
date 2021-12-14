@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.PixelFormat
 import android.util.Log
+import android.view.WindowManager
 import com.unity3d.player.UnityPlayer
+import java.lang.ref.WeakReference
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
-const val DEFAULT_WARMUP_DURATION_MS = 1000L
+const val DEFAULT_WARMUP_DURATION_MS = 0L
 
 /**
  * @author dhleong
@@ -74,6 +76,7 @@ object UnityPlayerManager {
 
     fun hasPlayer(): Boolean = lastPlayer?.valid == true
 
+    @Suppress("DEPRECATION")
     private fun createPlayer(
         activity: Activity,
         warmupDurationMs: Long,
@@ -81,14 +84,16 @@ object UnityPlayerManager {
     ) {
         activity.runOnUiThread {
             activity.window.setFormat(PixelFormat.RGBA_8888)
-            val unity = ManagedUnityPlayer(UnityPlayer(activity))
+            val flag = activity.window.attributes.flags
+            val fullScreen = (flag and WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0
 
             // Start unity
+            val unity = ManagedUnityPlayer(UnityPlayer(activity), isFullScreen = fullScreen)
             UnityUtils.addUnityViewToBackground(unity)
             unity.resume()
 
             if (activeRequests.get() == 0) {
-                Log.v("UnityView", "no active requests")
+                Log.v("UnityView", "No active requests")
                 unity.pauseAfterWarmup(warmupDurationMs)
             }
 
@@ -98,10 +103,15 @@ object UnityPlayerManager {
 
     private fun ManagedUnityPlayer.pauseAfterWarmup(warmupDurationMs: Long) {
         // NOTE: We delay the pause to give Unity a chance to "warm up"
-        player.view.postDelayed({
-            if (activeRequests.get() == 0) {
-                pause()
-            }
-        }, warmupDurationMs)
+        if (warmupDurationMs <= 0) {
+            pause()
+        } else {
+            val unity = WeakReference(this)
+            player.view.postDelayed({
+                if (activeRequests.get() == 0) {
+                    unity.get()?.pause()
+                }
+            }, warmupDurationMs)
+        }
     }
 }

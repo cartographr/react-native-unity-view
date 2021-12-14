@@ -1,8 +1,10 @@
 package no.asmadsen.unity.view
 
+import android.app.Activity
 import android.os.Looper
 import android.util.Log
 import android.view.ViewGroup
+import android.view.WindowManager
 import com.unity3d.player.UnityPlayer
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -10,7 +12,10 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * @author dhleong
  */
-class ManagedUnityPlayer(val player: UnityPlayer) {
+class ManagedUnityPlayer(
+    val player: UnityPlayer,
+    private val isFullScreen: Boolean,
+) {
     private enum class State(
         val isPause: Boolean,
     ) {
@@ -56,6 +61,8 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
             player.requestFocus()
         }
         player.resume()
+        applyFullscreen()
+
         queueGLThreadEvent {
             log("completed resume")
             val requested = currentState.get()
@@ -81,6 +88,7 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
         }
 
         player.pause()
+
         queueGLThreadEvent {
             log("completed pause")
             val requested = currentState.get()
@@ -103,8 +111,32 @@ class ManagedUnityPlayer(val player: UnityPlayer) {
         }
     }
 
+    fun applyFullscreen() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            setFullscreen(isFullScreen)
+        } else {
+            (player.context as? Activity)?.runOnUiThread {
+                setFullscreen(isFullScreen)
+            }
+        }
+    }
+
     private fun queueGLThreadEvent(callback: () -> Unit) {
         queueGLThreadEventMethod.invoke(player, Runnable(callback))
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setFullscreen(isFullScreen: Boolean) {
+        val activity = player.context as? Activity ?: return
+        if (!isFullScreen) {
+            Log.v("UnityView", "Not fullscreen")
+            activity.window.apply {
+                addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+                clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
+        } else {
+            Log.v("UnityView", "Fullscreen")
+        }
     }
 
     companion object {
